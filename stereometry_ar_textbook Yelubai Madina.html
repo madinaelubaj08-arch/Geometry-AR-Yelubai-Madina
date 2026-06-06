@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stereometry AR — Электронды оқулық</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+:root {
+  --blue: #1565C0; --blue-light: #E3F2FD; --blue-dark: #0D47A1;
+  --teal: #00838F; --teal-light: #E0F7FA;
+  --orange: #E65100; --orange-light: #FFF3E0;
+  --green: #2E7D32; --green-light: #E8F5E9;
+  --purple: #6A1B9A; --purple-light: #F3E5F5;
+  --red: #C62828; --red-light: #FFEBEE;
+  --gray: #455A64; --gray-light: #ECEFF1;
+  --white: #FFFFFF; --bg: #F8FAFC;
+  --text: #1A2332; --text-muted: #64748B;
+  --shadow: 0 4px 24px rgba(21,101,192,0.10);
+  --radius: 16px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  position:fixed; left:0; top:0; bottom:0; width:280px;
+  background:var(--blue-dark);
+  display:flex; flex-direction:column;
+  z-index:100; overflow-y:auto;
+  box-shadow:4px 0 24px rgba(13,71,161,0.3);
+}
+.sidebar-logo {
+  padding:28px 24px 20px;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+}
+.sidebar-logo .logo-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.15); border-radius:30px;
+  padding:4px 12px; margin-bottom:10px;
+  font-size:11px; font-weight:800; color:rgba(255,255,255,0.9);
+  letter-spacing:1px; text-transform:uppercase;
+}
+.sidebar-logo h2 {
+  font-family:'Montserrat',sans-serif;
+  font-size:20px; font-weight:900; color:#fff; line-height:1.2;
+}
+.sidebar-logo p { font-size:11px; color:rgba(255,255,255,0.55); margin-top:4px; font-weight:600; }
+
+.sidebar-nav { padding:16px 0; flex:1; }
+.nav-section-label {
+  font-size:10px; font-weight:800; letter-spacing:1.5px;
+  text-transform:uppercase; color:rgba(255,255,255,0.4);
+  padding:12px 24px 6px;
+}
+.nav-item {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 24px; cursor:pointer;
+  transition:all 0.2s; border-left:3px solid transparent;
+  color:rgba(255,255,255,0.7); font-size:13px; font-weight:700;
+  text-decoration:none;
+}
+.nav-item:hover { background:rgba(255,255,255,0.08); color:#fff; }
+.nav-item.active {
+  background:rgba(255,255,255,0.13); color:#fff;
+  border-left-color:#64B5F6;
+}
+.nav-item .nav-icon {
+  width:28px; height:28px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; flex-shrink:0;
+}
+.nav-item .nav-num {
+  width:20px; height:20px; border-radius:50%;
+  background:rgba(255,255,255,0.15); display:flex;
+  align-items:center; justify-content:center;
+  font-size:10px; font-weight:800; color:#fff; flex-shrink:0;
+}
+
+.sidebar-footer {
+  padding:16px 24px;
+  border-top:1px solid rgba(255,255,255,0.1);
+  font-size:11px; color:rgba(255,255,255,0.4); font-weight:600;
+}
+
+/* MAIN */
+.main { margin-left:280px; min-height:100vh; }
+
+/* PAGE sections */
+.page { display:none; padding:40px 48px; max-width:960px; }
+.page.active { display:block; }
+
+/* HERO */
+.hero {
+  background:linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%);
+  border-radius:24px; padding:48px; margin-bottom:36px;
+  position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute;
+  width:400px; height:400px; border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  top:-100px; right:-80px;
+}
+.hero::after {
+  content:''; position:absolute;
+  width:200px; height:200px; border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  bottom:-60px; left:40px;
+}
+.hero-tag {
+  display:inline-block; background:rgba(255,255,255,0.2);
+  border-radius:30px; padding:5px 16px;
+  font-size:11px; font-weight:800; color:#fff;
+  letter-spacing:1px; text-transform:uppercase; margin-bottom:16px;
+}
+.hero h1 {
+  font-family:'Montserrat',sans-serif;
+  font-size:36px; font-weight:900; color:#fff;
+  line-height:1.2; margin-bottom:12px; position:relative; z-index:1;
+}
+.hero h1 span { color:#90CAF9; }
+.hero p { color:rgba(255,255,255,0.8); font-size:15px; font-weight:600; max-width:600px; line-height:1.6; position:relative; z-index:1; }
+.hero-stats {
+  display:flex; gap:24px; margin-top:28px; position:relative; z-index:1; flex-wrap:wrap;
+}
+.hero-stat {
+  background:rgba(255,255,255,0.12); border-radius:12px;
+  padding:12px 20px; text-align:center;
+}
+.hero-stat .num { font-family:'Montserrat',sans-serif; font-size:22px; font-weight:900; color:#fff; }
+.hero-stat .lbl { font-size:10px; color:rgba(255,255,255,0.7); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+
+/* SECTION TITLE */
+.section-title {
+  font-family:'Montserrat',sans-serif;
+  font-size:22px; font-weight:800; color:var(--text);
+  margin-bottom:6px;
+}
+.section-sub { font-size:14px; color:var(--text-muted); font-weight:600; margin-bottom:28px; }
+
+/* CARDS GRID */
+.cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:32px; }
+.cards-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:32px; }
+
+/* FIGURE CARD */
+.fig-card {
+  background:#fff; border-radius:var(--radius);
+  overflow:hidden; box-shadow:var(--shadow);
+  border:1.5px solid #E8EDF5; cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.2s;
+}
+.fig-card:hover { transform:translateY(-3px); box-shadow:0 8px 32px rgba(21,101,192,0.15); }
+.fig-card-top { padding:24px 20px 16px; position:relative; }
+.fig-card-icon { font-size:48px; margin-bottom:12px; display:block; }
+.fig-card-title {
+  font-family:'Montserrat',sans-serif;
+  font-size:16px; font-weight:800; color:var(--text); margin-bottom:4px;
+}
+.fig-card-sub { font-size:12px; color:var(--text-muted); font-weight:600; }
+.fig-card-body { padding:0 20px 20px; }
+.fig-card-formula {
+  background:var(--blue-light); border-radius:10px;
+  padding:10px 14px; margin-bottom:12px;
+  font-size:13px; font-weight:700; color:var(--blue);
+}
+.fig-card-desc { font-size:12.5px; color:var(--text-muted); line-height:1.6; font-weight:600; }
+.fig-card-bar { height:4px; }
+
+/* INFO BOX */
+.info-box {
+  border-radius:14px; padding:20px 24px; margin-bottom:20px;
+  display:flex; gap:16px; align-items:flex-start;
+}
+.info-box.blue { background:var(--blue-light); border-left:4px solid var(--blue); }
+.info-box.teal { background:var(--teal-light); border-left:4px solid var(--teal); }
+.info-box.orange { background:var(--orange-light); border-left:4px solid var(--orange); }
+.info-box.green { background:var(--green-light); border-left:4px solid var(--green); }
+.info-box.purple { background:var(--purple-light); border-left:4px solid var(--purple); }
+.info-box.red { background:var(--red-light); border-left:4px solid var(--red); }
+.info-icon { font-size:24px; flex-shrink:0; margin-top:2px; }
+.info-title { font-size:13px; font-weight:800; margin-bottom:4px; }
+.info-box.blue .info-title { color:var(--blue); }
+.info-box.teal .info-title { color:var(--teal); }
+.info-box.orange .info-title { color:var(--orange); }
+.info-box.green .info-title { color:var(--green); }
+.info-box.purple .info-title { color:var(--purple); }
+.info-box.red .info-title { color:var(--red); }
+.info-text { font-size:13px; color:var(--text); font-weight:600; line-height:1.6; }
+
+/* EXERCISE CARD */
+.exercise-card {
+  background:#fff; border-radius:var(--radius);
+  padding:24px; margin-bottom:20px;
+  box-shadow:var(--shadow); border:1.5px solid #E8EDF5;
+}
+.ex-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.ex-num {
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Montserrat',sans-serif; font-size:14px; font-weight:900; color:#fff;
+  flex-shrink:0;
+}
+.ex-title { font-size:14px; font-weight:800; color:var(--text); }
+.ex-level { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-left:auto; }
+.ex-body { font-size:13.5px; color:var(--text); line-height:1.7; font-weight:600; margin-bottom:16px; }
+.ex-formula { background:var(--gray-light); border-radius:10px; padding:12px 16px; margin-bottom:12px; font-size:13px; }
+.ex-answer {
+  background:var(--green-light); border-radius:10px;
+  padding:10px 16px; font-size:13px; font-weight:700; color:var(--green);
+  display:none;
+}
+.ex-answer.show { display:block; }
+.ex-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--blue); color:#fff; border:none;
+  border-radius:10px; padding:8px 18px;
+  font-size:12px; font-weight:700; cursor:pointer;
+  transition:background 0.2s; font-family:'Nunito',sans-serif;
+}
+.ex-btn:hover { background:var(--blue-dark); }
+.ex-btn.teal { background:var(--teal); }
+.ex-btn.teal:hover { background:#006064; }
+
+/* QR BOX */
+.qr-box {
+  background:#fff; border-radius:14px; padding:20px;
+  display:flex; align-items:center; gap:20px;
+  box-shadow:var(--shadow); border:1.5px solid #E8EDF5;
+  margin-bottom:20px;
+}
+.qr-placeholder {
+  width:80px; height:80px; border-radius:10px;
+  background:var(--text); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; flex-shrink:0;
+  position:relative; overflow:hidden;
+}
+.qr-grid {
+  display:grid; grid-template-columns:repeat(7,1fr);
+  gap:1.5px; padding:8px; width:100%; height:100%;
+}
+.qr-cell { border-radius:1px; }
+.qr-info { flex:1; }
+.qr-title { font-size:13px; font-weight:800; color:var(--text); margin-bottom:4px; }
+.qr-desc { font-size:12px; color:var(--text-muted); font-weight:600; line-height:1.5; }
+.qr-link {
+  display:inline-block; margin-top:8px; font-size:11px;
+  font-weight:700; color:var(--blue); text-decoration:none;
+  background:var(--blue-light); border-radius:6px; padding:3px 10px;
+}
+
+/* FORMULA TABLE */
+.formula-table {
+  width:100%; background:#fff; border-radius:var(--radius);
+  overflow:hidden; box-shadow:var(--shadow); border:1.5px solid #E8EDF5;
+  border-collapse:separate; border-spacing:0; margin-bottom:28px;
+}
+.formula-table th {
+  background:var(--blue); color:#fff; padding:12px 16px;
+  font-size:12px; font-weight:800; text-align:left;
+  letter-spacing:0.3px;
+}
+.formula-table td { padding:12px 16px; font-size:13px; font-weight:600; border-bottom:1px solid #F0F4F8; }
+.formula-table tr:last-child td { border-bottom:none; }
+.formula-table tr:hover td { background:#F8FAFC; }
+.formula-tag {
+  display:inline-block; font-size:10px; font-weight:700;
+  padding:2px 8px; border-radius:20px;
+}
+
+/* STEP CARD */
+.step-list { display:flex; flex-direction:column; gap:16px; margin-bottom:28px; }
+.step-item { display:flex; gap:16px; align-items:flex-start; }
+.step-num {
+  width:36px; height:36px; border-radius:50%; flex-shrink:0;
+  background:var(--blue); color:#fff;
+  font-family:'Montserrat',sans-serif; font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+}
+.step-content { flex:1; }
+.step-title { font-size:14px; font-weight:800; color:var(--text); margin-bottom:4px; }
+.step-desc { font-size:13px; color:var(--text-muted); font-weight:600; line-height:1.6; }
+.step-code {
+  background:#1A2332; border-radius:8px; padding:10px 14px;
+  font-family:monospace; font-size:12px; color:#90CAF9;
+  margin-top:8px; border-left:3px solid var(--blue);
+}
+
+/* TABS */
+.tab-bar { display:flex; gap:4px; margin-bottom:24px; background:#fff; border-radius:12px; padding:6px; box-shadow:var(--shadow); }
+.tab-btn {
+  flex:1; padding:10px 12px; border:none; border-radius:8px;
+  font-family:'Nunito',sans-serif; font-size:12px; font-weight:800;
+  cursor:pointer; transition:all 0.2s; color:var(--text-muted); background:transparent;
+}
+.tab-btn.active { background:var(--blue); color:#fff; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* BADGE */
+.badge {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:10px; font-weight:800; padding:3px 10px;
+  border-radius:20px; letter-spacing:0.3px;
+}
+.badge.blue { background:var(--blue-light); color:var(--blue); }
+.badge.green { background:var(--green-light); color:var(--green); }
+.badge.orange { background:var(--orange-light); color:var(--orange); }
+.badge.purple { background:var(--purple-light); color:var(--purple); }
+
+/* PROGRESS */
+.progress-section { background:#fff; border-radius:14px; padding:20px 24px; box-shadow:var(--shadow); margin-bottom:24px; }
+.progress-title { font-size:13px; font-weight:800; color:var(--text); margin-bottom:12px; }
+.progress-bar-wrap { background:#F0F4F8; border-radius:30px; height:8px; margin-bottom:6px; }
+.progress-bar-fill { height:100%; border-radius:30px; transition:width 0.5s; }
+.progress-label { display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--text-muted); }
+
+/* DIVIDER */
+.divider { height:1px; background:#EEF2F7; margin:28px 0; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom:32px; }
+.page-header .breadcrumb { font-size:12px; color:var(--text-muted); font-weight:700; margin-bottom:8px; }
+.page-header h2 { font-family:'Montserrat',sans-serif; font-size:26px; font-weight:900; color:var(--text); }
+.page-header p { font-size:14px; color:var(--text-muted); font-weight:600; margin-top:6px; }
+
+/* MOBILE toggle */
+.menu-toggle { display:none; }
+
+@media(max-width:900px){
+  .sidebar { transform:translateX(-100%); transition:transform 0.3s; }
+  .sidebar.open { transform:translateX(0); }
+  .main { margin-left:0; }
+  .page { padding:24px 20px; }
+  .cards-grid { grid-template-columns:1fr; }
+  .cards-grid-3 { grid-template-columns:1fr; }
+  .hero h1 { font-size:24px; }
+  .menu-toggle {
+    display:flex; position:fixed; top:16px; left:16px; z-index:200;
+    width:44px; height:44px; border-radius:12px; background:var(--blue);
+    align-items:center; justify-content:center; border:none; cursor:pointer;
+    font-size:20px; color:#fff; box-shadow:0 4px 16px rgba(21,101,192,0.3);
+  }
+}
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-badge">📐 Электронды оқулық</div>
+    <h2>Stereometry AR</h2>
+    <p>10–11 сынып · 2025–2026 оқу жылы</p>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Кіріспе</div>
+    <a class="nav-item active" onclick="showPage('home')">
+      <div class="nav-icon" style="background:rgba(100,181,246,0.2)">🏠</div>
+      Басты бет
+    </a>
+    <a class="nav-item" onclick="showPage('guide')">
+      <div class="nav-icon" style="background:rgba(100,181,246,0.2)">📱</div>
+      AR қолдану нұсқаулығы
+    </a>
+
+    <div class="nav-section-label">Стереометрия фигуралары</div>
+    <a class="nav-item" onclick="showPage('prism')">
+      <div class="nav-num">1</div> Призма
+    </a>
+    <a class="nav-item" onclick="showPage('pyramid')">
+      <div class="nav-num">2</div> Пирамида
+    </a>
+    <a class="nav-item" onclick="showPage('cylinder')">
+      <div class="nav-num">3</div> Цилиндр
+    </a>
+    <a class="nav-item" onclick="showPage('cone')">
+      <div class="nav-num">4</div> Конус
+    </a>
+    <a class="nav-item" onclick="showPage('sphere')">
+      <div class="nav-num">5</div> Шар және сфера
+    </a>
+
+    <div class="nav-section-label">Тапсырмалар</div>
+    <a class="nav-item" onclick="showPage('exercises')">
+      <div class="nav-icon" style="background:rgba(100,181,246,0.2)">✏️</div>
+      НЗМ / SAT / PISA есептері
+    </a>
+    <a class="nav-item" onclick="showPage('formulas')">
+      <div class="nav-icon" style="background:rgba(100,181,246,0.2)">📋</div>
+      Формулалар кестесі
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    «Дарын» мектеп-лицей-интернаты<br>
+    Педагогикалық практика · 2025-2026
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-tag">📐 AR технологиясы · Стереометрия</div>
+    <h1>Stereometry <span>AR</span> Электронды оқулық</h1>
+    <p>3D Calculator бағдарламасы арқылы стереометрия фигураларын толықтырылған шындық (AR) режимінде зерттейтін интерактивті оқулық. 10–11 сынып оқушыларына арналған.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">6</div><div class="lbl">Фигура</div></div>
+      <div class="hero-stat"><div class="num">20+</div><div class="lbl">Есеп</div></div>
+      <div class="hero-stat"><div class="num">AR</div><div class="lbl">Режим</div></div>
+      <div class="hero-stat"><div class="num">QR</div><div class="lbl">Кодтар</div></div>
+    </div>
+  </div>
+
+  <h3 class="section-title">Оқулықтың мазмұны</h3>
+  <p class="section-sub">Стереометрияның 6 негізгі фигурасы — AR бейнесімен, формулаларымен және есептерімен</p>
+
+  <div class="cards-grid-3">
+    <div class="fig-card" onclick="showPage('prism')">
+      <div class="fig-card-bar" style="background:#1565C0"></div>
+      <div class="fig-card-top">
+        <span class="fig-card-icon">🔷</span>
+        <div class="fig-card-title">Призма</div>
+        <div class="fig-card-sub">Тік және қиғаш призма</div>
+      </div>
+      <div class="fig-card-body">
+        <div class="fig-card-formula">\(V = S_{\text{нег}} \cdot h\)</div>
+        <div class="fig-card-desc">Параллелепипед, тікбұрышты призма, дұрыс призма</div>
+      </div>
+    </div>
+    <div class="fig-card" onclick="showPage('pyramid')">
+      <div class="fig-card-bar" style="background:#E65100"></div>
+      <div class="fig-card-top">
+        <span class="fig-card-icon">🔺</span>
+        <div class="fig-card-title">Пирамида</div>
+        <div class="fig-card-sub">Дұрыс және қиық пирамида</div>
+      </div>
+      <div class="fig-card-body">
+        <div class="fig-card-formula">\(V = \tfrac{1}{3}S_{\text{нег}} \cdot h\)</div>
+        <div class="fig-card-desc">Тетраэдр, дұрыс n-бұрышты пирамида</div>
+      </div>
+    </div>
+    <div class="fig-card" onclick="showPage('cylinder')">
+      <div class="fig-card-bar" style="background:#00838F"></div>
+      <div class="fig-card-top">
+        <span class="fig-card-icon">🥫</span>
+        <div class="fig-card-title">Цилиндр</div>
+        <div class="fig-card-sub">Тік циркулярлы цилиндр</div>
+      </div>
+      <div class="fig-card-body">
+        <div class="fig-card-formula">\(V = \pi r^2 h\)</div>
+        <div class="fig-card-desc">Бүйір беті, толық беті, остік қима</div>
+      </div>
+    </div>
+    <div class="fig-card" onclick="showPage('cone')">
+      <div class="fig-card-bar" style="background:#6A1B9A"></div>
+      <div class="fig-card-top">
+        <span class="fig-card-icon">🍦</span>
+        <div class="fig-card-title">Конус</div>
+        <div class="fig-card-sub">Тік циркулярлы конус</div>
+      </div>
+      <div class="fig-card-body">
+        <div class="fig-card-formula">\(V = \tfrac{1}{3}\pi r^2 h\)</div>
+        <div class="fig-card-desc">Жасаушы, апофема, қиық конус</div>
+      </div>
+    </div>
+    <div class="fig-card" onclick="showPage('sphere')">
+      <div class="fig-card-bar" style="background:#2E7D32"></div>
+      <div class="fig-card-top">
+        <span class="fig-card-icon">🌐</span>
+        <div class="fig-card-title">Шар және сфера</div>
+        <div class="fig-card-sub">Шар, сфера, шар қимасы</div>
+      </div>
+      <div class="fig-card-body">
+        <div class="fig-card-formula">\(V = \tfrac{4}{3}\pi r^3\)</div>
+        <div class="fig-card-desc">Үлкен шеңбер, шар бетінің ауданы</div>
+      </div>
+    </div>
+    <div class="fig-card" onclick="showPage('exercises')">
+      <div class="fig-card-bar" style="background:#C62828"></div>
+      <div class="fig-card-top">
+        <span class="fig-card-icon">✏️</span>
+        <div class="fig-card-title">Есептер жинағы</div>
+        <div class="fig-card-sub">НЗМ · SAT · PISA · TIMSS</div>
+      </div>
+      <div class="fig-card-body">
+        <div class="fig-card-formula" style="background:#FFEBEE;color:#C62828">20+ есеп · 3 деңгей</div>
+        <div class="fig-card-desc">Халықаралық форматтардан іріктелген кеңістіктік есептер</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box blue">
+    <div class="info-icon">📱</div>
+    <div>
+      <div class="info-title">AR режимін іске қосу</div>
+      <div class="info-text">Смартфонға 3D Calculator бағдарламасын жүктеп алыңыз. Әр фигура бетіндегі QR-кодты сканерлесеңіз, фигураның AR бейнесі автоматты түрде ашылады. Android 8.0+ және iOS 12.0+ нұсқаларында жұмыс жасайды.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GUIDE PAGE ===== -->
+<div class="page" id="page-guide">
+  <div class="page-header">
+    <div class="breadcrumb">Кіріспе → AR нұсқаулығы</div>
+    <h2>3D Calculator AR — Қолдану нұсқаулығы</h2>
+    <p>Стереометрия фигурасының AR бейнесін алудың қадам-қадам жолы</p>
+  </div>
+
+  <div class="info-box teal">
+    <div class="info-icon">ℹ️</div>
+    <div>
+      <div class="info-title">3D Calculator дегеніміз не?</div>
+      <div class="info-text">GeoGebra-ның жаңартылған нұсқасы — мобильді AR мүмкіндігімен кеңейтілген 3D геометрия бағдарламасы. Қазақстандық мектептерде Шыныбеков оқулығында GeoGebra сілтемелері берілген — 3D Calculator оның заманауи баламасы.</div>
+    </div>
+  </div>
+
+  <h3 class="section-title">Іске қосу қадамдары</h3>
+  <p class="section-sub">5 минутта AR режимін дайындаңыз</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Бағдарламаны жүктеу</div>
+        <div class="step-desc">App Store немесе Google Play дүкенінен «GeoGebra 3D Calculator» бағдарламасын жүктеп алыңыз. Тегін, интернет арқылы орнатылады.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Фигура жасау</div>
+        <div class="step-desc">Бағдарламаны ашып, кіріс өрісіне фигура командасын енгізіңіз. Мысалы, конус үшін:</div>
+        <div class="step-code">Cone((0,0,0), (0,0,4), 3)</div>
+        <div class="step-desc" style="margin-top:8px">— бұл негіздің центрі (0,0,0)-де, биіктігі 4, радиусы 3 болатын конус береді.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Қосымша элементтерді белгілеу</div>
+        <div class="step-desc">Апофема, биіктік, кесінді — есепте маңызды элементтерді жеке белгілеңіз. «New Point» және «Segment» командалары пайдаланылады.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">AR режимін іске қосу</div>
+        <div class="step-desc">Интерфейстің <strong>оң жақ төменгі бұрышындағы AR белгісіне</strong> басыңыз. Камера іске қосылады. Телефонды кез келген тегіс беттің үстінде ұстасаңыз — фигура «пайда болады».</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <div class="step-title">Зерттеу және есеп шығару</div>
+        <div class="step-desc">AR режимінде фигураны айналдырып, кез келген бұрыштан қараңыз. Апофеманы, биіктікті, диагональді «ізде» — есептің шешімі фигурадан шығады.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="info-box green">
+      <div class="info-icon">✅</div>
+      <div>
+        <div class="info-title">Артықшылықтары</div>
+        <div class="info-text">· Кез келген смартфонда жұмыс жасайды<br>· Тегін қолжетімді<br>· Фигураны нақты ортада көрсетеді<br>· Сабақта уақытты үнемдейді (30 сек)</div>
+      </div>
+    </div>
+    <div class="info-box orange">
+      <div class="info-icon">⚠️</div>
+      <div>
+        <div class="info-title">Шектеулері</div>
+        <div class="info-text">· Интернет байланысы керек<br>· Android 8.0+ / iOS 12.0+ қажет<br>· Оффлайн режимде жұмыс жасамайды<br>· Динамикалық кесінді мүмкіндігі жоқ</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-title">Негізгі командалар</h3>
+  <table class="formula-table">
+    <thead><tr><th>Фигура</th><th>3D Calculator командасы</th><th>Параметрлер</th></tr></thead>
+    <tbody>
+      <tr><td>Конус</td><td><code>Cone((0,0,0),(0,0,h),r)</code></td><td>h — биіктік, r — радиус</td></tr>
+      <tr><td>Цилиндр</td><td><code>Cylinder((0,0,0),(0,0,h),r)</code></td><td>h — биіктік, r — радиус</td></tr>
+      <tr><td>Шар</td><td><code>Sphere((0,0,0),r)</code></td><td>r — радиус</td></tr>
+      <tr><td>Куб</td><td><code>Cube((0,0,0),(a,0,0))</code></td><td>a — қыр ұзындығы</td></tr>
+      <tr><td>Пирамида</td><td><code>Pyramid(&lt;Polygon&gt;,h)</code></td><td>Polygon — негіз, h — биіктік</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== PYRAMID PAGE ===== -->
+<div class="page" id="page-pyramid">
+  <div class="page-header">
+    <div class="breadcrumb">Фигуралар → Пирамида</div>
+    <h2>🔺 Пирамида</h2>
+    <p>Дұрыс пирамида, қиық пирамида, тетраэдр — AR бейнесімен</p>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(this,'pyramid','theory')">Теория</button>
+    <button class="tab-btn" onclick="switchTab(this,'pyramid','formulas')">Формулалар</button>
+    <button class="tab-btn" onclick="switchTab(this,'pyramid','ar')">AR бейне</button>
+    <button class="tab-btn" onclick="switchTab(this,'pyramid','exercises')">Есептер</button>
+  </div>
+
+  <div class="tab-panel active" id="pyramid-theory">
+    <div class="info-box blue">
+      <div class="info-icon">📖</div>
+      <div>
+        <div class="info-title">Анықтама</div>
+        <div class="info-text">Пирамида — бір жазықтықта жатқан көпбұрыш негізден және ортақ бір нүктеге — төбеге — жиналатын үшбұрышты беттерден тұратын геометриялық дене.</div>
+      </div>
+    </div>
+    <div class="info-box orange">
+      <div class="info-icon">📐</div>
+      <div>
+        <div class="info-title">Апофема дегеніміз не?</div>
+        <div class="info-text">Дұрыс пирамиданың апофемасы — бүйір бетінің биіктігі, яғни бүйір үшбұрыштың төбеден негіздің ортасына дейінгі биіктігі. Апофема \(a\), биіктік \(h\) және негіздің жарты периметрі \(\frac{P}{2}\) арасындағы байланыс: \(a = \sqrt{h^2 + r^2}\), мұндағы \(r\) — негіздің сырт бұрыштық радиусы.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="pyramid-formulas">
+    <table class="formula-table">
+      <thead><tr><th>Шама</th><th>Формула</th><th>Белгілеулер</th></tr></thead>
+      <tbody>
+        <tr><td>Бүйір беттік аудан</td><td>\(S_{\text{бүйір}} = \dfrac{1}{2} P_{\text{нег}} \cdot a\)</td><td>\(P\) — периметр, \(a\) — апофема</td></tr>
+        <tr><td>Толық беттік аудан</td><td>\(S_{\text{толық}} = S_{\text{бүйір}} + S_{\text{нег}}\)</td><td></td></tr>
+        <tr><td>Көлем</td><td>\(V = \dfrac{1}{3} S_{\text{нег}} \cdot h\)</td><td>\(h\) — биіктік</td></tr>
+        <tr><td>Қиық пирамида көлемі</td><td>\(V = \dfrac{h}{3}(S_1 + S_2 + \sqrt{S_1 S_2})\)</td><td>\(S_1, S_2\) — негіздер ауданы</td></tr>
+        <tr><td>Тетраэдр бетінің ауданы</td><td>\(S = a^2\sqrt{3}\)</td><td>\(a\) — қыр ұзындығы</td></tr>
+        <tr><td>Тетраэдр көлемі</td><td>\(V = \dfrac{a^3\sqrt{2}}{12}\)</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tab-panel" id="pyramid-ar">
+    <div class="info-box teal">
+      <div class="info-icon">📱</div>
+      <div><div class="info-title">AR режимін ашу</div><div class="info-text">Төмендегі QR-кодтарды 3D Calculator бағдарламасы арқылы сканерлеңіз. Пирамиданың AR бейнесі смартфон камерасы арқылы нақты ортада пайда болады.</div></div>
+    </div>
+    <div class="qr-box">
+      <div class="qr-placeholder"><svg width="64" height="64" viewBox="0 0 64 64"><rect x="4" y="4" width="24" height="24" rx="2" fill="none" stroke="#90CAF9" stroke-width="2"/><rect x="9" y="9" width="14" height="14" fill="#90CAF9"/><rect x="36" y="4" width="24" height="24" rx="2" fill="none" stroke="#90CAF9" stroke-width="2"/><rect x="41" y="9" width="14" height="14" fill="#90CAF9"/><rect x="4" y="36" width="24" height="24" rx="2" fill="none" stroke="#90CAF9" stroke-width="2"/><rect x="9" y="41" width="14" height="14" fill="#90CAF9"/><rect x="36" y="36" width="8" height="8" fill="#90CAF9"/><rect x="48" y="36" width="8" height="8" fill="#90CAF9"/><rect x="36" y="48" width="8" height="8" fill="#90CAF9"/><rect x="48" y="52" width="12" height="8" fill="#90CAF9"/></svg></div>
+      <div class="qr-info"><div class="qr-title">Дұрыс төртбұрышты пирамида — AR бейне</div><div class="qr-desc">Негіздің қабырғасы \(a = 6\) см, биіктігі \(h = 8\) см. Апофема белгіленген. Айналдырып, кез келген бұрыштан қараңыз.</div><span class="qr-link">🔗 3D Calculator арқылы ашу</span></div>
+    </div>
+    <div class="qr-box">
+      <div class="qr-placeholder"><svg width="64" height="64" viewBox="0 0 64 64"><rect x="4" y="4" width="24" height="24" rx="2" fill="none" stroke="#90CAF9" stroke-width="2"/><rect x="9" y="9" width="6" height="6" fill="#90CAF9"/><rect x="17" y="9" width="6" height="6" fill="#90CAF9"/><rect x="9" y="17" width="6" height="6" fill="#90CAF9"/><rect x="17" y="17" width="6" height="6" fill="#90CAF9"/><rect x="36" y="4" width="24" height="24" rx="2" fill="none" stroke="#90CAF9" stroke-width="2"/><rect x="41" y="9" width="14" height="14" fill="#90CAF9"/><rect x="4" y="36" width="24" height="24" rx="2" fill="none" stroke="#90CAF9" stroke-width="2"/><rect x="9" y="41" width="14" height="14" fill="#90CAF9"/><rect x="36" y="36" width="24" height="8" fill="#90CAF9"/><rect x="36" y="48" width="8" height="12" fill="#90CAF9"/><rect x="52" y="48" width="8" height="12" fill="#90CAF9"/></svg></div>
+      <div class="qr-info"><div class="qr-title">Қиық пирамида — AR бейне</div><div class="qr-desc">Радиустары \(r_1 = 3\) см, \(r_2 = 6\) см, биіктігі \(h = 5\) см. Жоғарғы және төменгі негіздер белгіленген.</div><span class="qr-link">🔗 3D Calculator арқылы ашу</span></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="pyramid-exercises">
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div class="ex-num" style="background:#E65100">1</div>
+        <div class="ex-title">Дұрыс төртбұрышты пирамида</div>
+        <span class="ex-level badge orange">Базалық</span>
+      </div>
+      <div class="ex-body">Дұрыс төртбұрышты пирамиданың негізінің қабырғасы \(a = 6\) см, биіктігі \(h = 4\) см. Бүйір беттік ауданын табыңыз.</div>
+      <div class="ex-formula">\(S_{\text{бүйір}} = \dfrac{1}{2} \cdot P_{\text{нег}} \cdot a_{\text{аp}}, \quad a_{\text{аp}} = \sqrt{h^2 + \left(\dfrac{a}{2}\right)^2}\)</div>
+      <div class="ex-answer" id="ans-p1">
+        \(a_{\text{аp}} = \sqrt{16 + 9} = 5\) см &nbsp;|&nbsp; \(P = 4 \times 6 = 24\) см<br>
+        \(S_{\text{бүйір}} = \dfrac{1}{2} \cdot 24 \cdot 5 = 60\) см²
+      </div>
+      <button class="ex-btn" onclick="toggleAnswer('ans-p1',this)">👁 Жауабын көру</button>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div class="ex-num" style="background:#E65100">2</div>
+        <div class="ex-title">Қиық пирамида (НЗМ форматы)</div>
+        <span class="ex-level badge orange">Орта</span>
+      </div>
+      <div class="ex-body">Қиық пирамиданың табандарының ауданы \(S_1 = 9\) см², \(S_2 = 25\) см², биіктігі \(h = 6\) см. Көлемін табыңыз.</div>
+      <div class="ex-formula">\(V = \dfrac{h}{3}\left(S_1 + S_2 + \sqrt{S_1 \cdot S_2}\right)\)</div>
+      <div class="ex-answer" id="ans-p2">
+        \(V = \dfrac{6}{3}(9 + 25 + \sqrt{225}) = 2 \cdot (9 + 25 + 15) = 2 \cdot 49 = 98\) см³
+      </div>
+      <button class="ex-btn" onclick="toggleAnswer('ans-p2',this)">👁 Жауабын көру</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CYLINDER PAGE ===== -->
+<div class="page" id="page-cylinder">
+  <div class="page-header">
+    <div class="breadcrumb">Фигуралар → Цилиндр</div>
+    <h2>🥫 Цилиндр</h2>
+    <p>Тік циркулярлы цилиндр — бүйір беті, көлемі, остік қима</p>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(this,'cyl','theory')">Теория</button>
+    <button class="tab-btn" onclick="switchTab(this,'cyl','formulas')">Формулалар</button>
+    <button class="tab-btn" onclick="switchTab(this,'cyl','ar')">AR бейне</button>
+    <button class="tab-btn" onclick="switchTab(this,'cyl','ex')">Есептер</button>
+  </div>
+  <div class="tab-panel active" id="cyl-theory">
+    <div class="info-box teal">
+      <div class="info-icon">📖</div>
+      <div><div class="info-title">Анықтама</div><div class="info-text">Цилиндр — параллель жазықтықтарда жататын тең шеңберлер арасындағы тіктөртбұрышты кеңістіктік дене. Бүйір беті — жазықтыққа жайғанда тіктөртбұрышқа айналады. Бір қабырға — биіктік \(h\), екінші қабырға — негіздің шеңбері \(2\pi r\).</div></div>
+    </div>
+    <div class="info-box blue">
+      <div class="info-icon">💡</div>
+      <div><div class="info-title">AR-да не іздейміз?</div><div class="info-text">Цилиндрді AR-да алғаш рет көргенде мына сұраққа жауап беріңіз: «Бүйір бетін жазықтыққа жайсақ, қандай пішін шығады?» — Тіктөртбұрыш. Неге? Биіктік бір қабырға, шеңбер екінші қабырға. Осы байланысты AR фигурасынан өзі «оқу» — формуланы жаттаудан мықтырақ.</div></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="cyl-formulas">
+    <table class="formula-table">
+      <thead><tr><th>Шама</th><th>Формула</th><th>Белгілеулер</th></tr></thead>
+      <tbody>
+        <tr><td>Бүйір беттік аудан</td><td>\(S_{\text{бүйір}} = 2\pi r h\)</td><td>\(r\) — радиус, \(h\) — биіктік</td></tr>
+        <tr><td>Толық беттік аудан</td><td>\(S_{\text{толық}} = 2\pi r(h + r)\)</td><td></td></tr>
+        <tr><td>Негіздің ауданы</td><td>\(S_{\text{нег}} = \pi r^2\)</td><td></td></tr>
+        <tr><td>Көлемі</td><td>\(V = \pi r^2 h\)</td><td></td></tr>
+        <tr><td>Остік қима диагоналі</td><td>\(d = \sqrt{(2r)^2 + h^2} = \sqrt{4r^2 + h^2}\)</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-panel" id="cyl-ar">
+    <div class="qr-box">
+      <div class="qr-placeholder"><svg width="64" height="64" viewBox="0 0 64 64"><rect x="4" y="4" width="24" height="24" rx="2" fill="none" stroke="#4DD0E1" stroke-width="2"/><rect x="9" y="9" width="14" height="14" fill="#4DD0E1"/><rect x="36" y="4" width="24" height="24" rx="2" fill="none" stroke="#4DD0E1" stroke-width="2"/><rect x="41" y="9" width="14" height="14" fill="#4DD0E1"/><rect x="4" y="36" width="24" height="24" rx="2" fill="none" stroke="#4DD0E1" stroke-width="2"/><rect x="9" y="41" width="14" height="14" fill="#4DD0E1"/><rect x="36" y="36" width="10" height="10" fill="#4DD0E1"/><rect x="50" y="36" width="10" height="10" fill="#4DD0E1"/><rect x="36" y="50" width="24" height="10" fill="#4DD0E1"/></svg></div>
+      <div class="qr-info"><div class="qr-title">Цилиндр AR бейнесі — \(r=3\), \(h=5\)</div><div class="qr-desc">Остік қима, биіктік, негіздің шеңбері белгіленген. Цилиндрді айналдырып, бүйір бетінің «ашылымын» елестетіңіз.</div><span class="qr-link">🔗 3D Calculator арқылы ашу</span></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="cyl-ex">
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div class="ex-num" style="background:#00838F">1</div>
+        <div class="ex-title">Цилиндр ішіне сызылған шар (PISA форматы)</div>
+        <span class="ex-level badge" style="background:#E0F7FA;color:#00838F">Жоғары</span>
+      </div>
+      <div class="ex-body">Радиусы \(R = \sqrt{3}\) см болатын шардың ішіне биіктігі мен табан диаметрі тең болатын цилиндр сызылған. Цилиндрдің көлемін табыңыз.</div>
+      <div class="ex-formula">\((2r)^2 + H^2 = (2R)^2, \quad H = 2r\)</div>
+      <div class="ex-answer" id="ans-c1">
+        \(8r^2 = 12 \Rightarrow r^2 = 1{,}5\)<br>
+        \(V = 2\pi r^3 = 2\pi \cdot 1{,}5 \cdot \sqrt{1{,}5} = 3\pi\sqrt{1{,}5}\) см³
+      </div>
+      <button class="ex-btn teal" onclick="toggleAnswer('ans-c1',this)">👁 Жауабын көру</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONE PAGE ===== -->
+<div class="page" id="page-cone">
+  <div class="page-header">
+    <div class="breadcrumb">Фигуралар → Конус</div>
+    <h2>🍦 Конус</h2>
+    <p>Тік циркулярлы конус — жасаушы, апофема, қиық конус</p>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(this,'con','theory')">Теория</button>
+    <button class="tab-btn" onclick="switchTab(this,'con','formulas')">Формулалар</button>
+    <button class="tab-btn" onclick="switchTab(this,'con','ar')">AR бейне</button>
+    <button class="tab-btn" onclick="switchTab(this,'con','ex')">Есептер</button>
+  </div>
+  <div class="tab-panel active" id="con-theory">
+    <div class="info-box purple">
+      <div class="info-icon">📖</div>
+      <div><div class="info-title">Жасаушы мен апофеманың айырмасы</div><div class="info-text">Конуста жасаушы \(l\) — төбеден негіздің шеңберіндегі кез келген нүктеге дейінгі кесінді. Апофема — тек дұрыс пирамидада қолданылатын ұғым; конуста оның орнын жасаушы алады. Байланыс: \(l = \sqrt{r^2 + h^2}\), мұндағы \(r\) — радиус, \(h\) — биіктік.</div></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="con-formulas">
+    <table class="formula-table">
+      <thead><tr><th>Шама</th><th>Формула</th></tr></thead>
+      <tbody>
+        <tr><td>Жасаушы</td><td>\(l = \sqrt{r^2 + h^2}\)</td></tr>
+        <tr><td>Бүйір беттік аудан</td><td>\(S_{\text{бүйір}} = \pi r l\)</td></tr>
+        <tr><td>Толық беттік аудан</td><td>\(S_{\text{толық}} = \pi r(l + r)\)</td></tr>
+        <tr><td>Көлемі</td><td>\(V = \dfrac{1}{3}\pi r^2 h\)</td></tr>
+        <tr><td>Қиық конус бүйір беті</td><td>\(S = \pi(R + r)l\)</td></tr>
+        <tr><td>Қиық конус көлемі</td><td>\(V = \dfrac{\pi h}{3}(R^2 + r^2 + Rr)\)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-panel" id="con-ar">
+    <div class="qr-box">
+      <div class="qr-placeholder"><svg width="64" height="64" viewBox="0 0 64 64"><rect x="4" y="4" width="24" height="24" rx="2" fill="none" stroke="#CE93D8" stroke-width="2"/><rect x="9" y="9" width="14" height="14" fill="#CE93D8"/><rect x="36" y="4" width="24" height="24" rx="2" fill="none" stroke="#CE93D8" stroke-width="2"/><rect x="41" y="9" width="14" height="14" fill="#CE93D8"/><rect x="4" y="36" width="24" height="24" rx="2" fill="none" stroke="#CE93D8" stroke-width="2"/><rect x="9" y="41" width="14" height="14" fill="#CE93D8"/><rect x="36" y="36" width="8" height="24" fill="#CE93D8"/><rect x="48" y="44" width="12" height="16" fill="#CE93D8"/></svg></div>
+      <div class="qr-info"><div class="qr-title">Конус AR бейнесі — \(r=3\), \(h=4\), \(l=5\)</div><div class="qr-desc">Жасаушы, биіктік, остік қима белгіленген. Конусты айналдырып, жасаушы мен биіктіктің тікбұрышты үшбұрыш құрайтынын байқаңыз.</div><span class="qr-link">🔗 3D Calculator арқылы ашу</span></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="con-ex">
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div class="ex-num" style="background:#6A1B9A">1</div>
+        <div class="ex-title">Шойын өзекті конусқа айналдыру (SAT форматы)</div>
+        <span class="ex-level badge purple">Жоғары</span>
+      </div>
+      <div class="ex-body">Радиусы \(r=1\) болатын шойын шарды балқытып, жасаушысы \(l=\sqrt{6}\) болатын конус жасалды. Конустың биіктігін табыңыз (\(h \geq 1\)).</div>
+      <div class="ex-formula">\(V_{\text{шар}} = V_{\text{конус}}, \quad h^3 - 6h + 4 = 0\)</div>
+      <div class="ex-answer" id="ans-cn1">
+        \(V_{\text{шар}} = \dfrac{4}{3}\pi\), &nbsp; \(R^2 = 6 - h^2\)<br>
+        \(h^3 - 6h + 4 = 0 \Rightarrow h = 2\) &nbsp; (тексеру: \(8 - 12 + 4 = 0\) ✓)<br>
+        <strong>Жауабы: \(h = 2\)</strong>
+      </div>
+      <button class="ex-btn" style="background:#6A1B9A" onclick="toggleAnswer('ans-cn1',this)">👁 Жауабын көру</button>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div class="ex-num" style="background:#6A1B9A">2</div>
+        <div class="ex-title">Қиық конустың бүйір беті (Олимпиада)</div>
+        <span class="ex-level badge purple">Жоғары</span>
+      </div>
+      <div class="ex-body">Қиық конустың табандарының радиустары \(r=9\) және \(R=24\). Осьтік қиманың диагональдарының қиылысу нүктесінен жасаушы \(60°\)-пен көрінеді. Бүйір бетінің ауданын табыңыз.</div>
+      <div class="ex-formula">\(S_{\text{бүйір}} = \pi(R+r) \cdot l\)</div>
+      <div class="ex-answer" id="ans-cn2">
+        \(k = \dfrac{r}{R} = \dfrac{9}{24} = \dfrac{3}{8}\), &nbsp; \(OA = 16\sqrt{3}\), &nbsp; \(OC = 6\sqrt{3}\)<br>
+        Косинустар теоремасы: \(l^2 = 108 + 768 - 288 = 588 \Rightarrow l = 14\sqrt{3}\)<br>
+        \(S = \pi(24+9) \cdot 14\sqrt{3} = 462\sqrt{3}\,\pi\)
+      </div>
+      <button class="ex-btn" style="background:#6A1B9A" onclick="toggleAnswer('ans-cn2',this)">👁 Жауабын көру</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SPHERE PAGE ===== -->
+<div class="page" id="page-sphere">
+  <div class="page-header">
+    <div class="breadcrumb">Фигуралар → Шар және сфера</div>
+    <h2>🌐 Шар және сфера</h2>
+    <p>Шар, сфера, шар қимасы — формулалар мен есептер</p>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(this,'sph','theory')">Теория</button>
+    <button class="tab-btn" onclick="switchTab(this,'sph','formulas')">Формулалар</button>
+    <button class="tab-btn" onclick="switchTab(this,'sph','ex')">Есептер</button>
+  </div>
+  <div class="tab-panel active" id="sph-theory">
+    <div class="info-box green">
+      <div class="info-icon">📖</div>
+      <div><div class="info-title">Шар мен сфераның айырмасы</div><div class="info-text"><strong>Сфера</strong> — кеңістіктегі берілген нүктеден (центрден) бірдей қашықтықта орналасқан нүктелердің жиыны. Тек <em>бет</em>. <strong>Шар</strong> — сфера мен оның ішіндегі кеңістікті қамтитын <em>дене</em>. Формула жаздырылғанда: \(S = 4\pi r^2\) — сфера беті, \(V = \dfrac{4}{3}\pi r^3\) — шар көлемі.</div></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="sph-formulas">
+    <table class="formula-table">
+      <thead><tr><th>Шама</th><th>Формула</th></tr></thead>
+      <tbody>
+        <tr><td>Сфера беттік ауданы</td><td>\(S = 4\pi r^2\)</td></tr>
+        <tr><td>Шар көлемі</td><td>\(V = \dfrac{4}{3}\pi r^3\)</td></tr>
+        <tr><td>Шар қимасының ауданы</td><td>\(S_{\text{қима}} = \pi(2rH - H^2)\)</td></tr>
+        <tr><td>Шар қимасының көлемі</td><td>\(V_{\text{қима}} = \dfrac{\pi H^2}{3}(3r - H)\)</td></tr>
+        <tr><td>Үлкен шеңбер ауданы</td><td>\(S_{\text{шеңбер}} = \pi r^2\)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-panel" id="sph-ex">
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div class="ex-num" style="background:#2E7D32">1</div>
+        <div class="ex-title">Шарға іштей сызылған цилиндр</div>
+        <span class="ex-level badge green">Орта</span>
+      </div>
+      <div class="ex-body">Радиусы \(R = \sqrt{3}\) болатын шарға биіктігі мен диаметрі тең цилиндр іштей сызылған. Цилиндрдің бүйір беттік ауданын табыңыз.</div>
+      <div class="ex-formula">\((2r)^2 + (2r)^2 = (2R)^2 \Rightarrow r^2 = 1{,}5\)</div>
+      <div class="ex-answer" id="ans-s1">
+        \(r = \sqrt{1{,}5}\), &nbsp; \(h = 2r = 2\sqrt{1{,}5}\)<br>
+        \(S_{\text{бүйір}} = 2\pi r h = 2\pi \cdot \sqrt{1{,}5} \cdot 2\sqrt{1{,}5} = 2\pi \cdot 2 \cdot 1{,}5 = 6\pi\) см²
+      </div>
+      <button class="ex-btn" style="background:#2E7D32" onclick="toggleAnswer('ans-s1',this)">👁 Жауабын көру</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRISM PAGE ===== -->
+<div class="page" id="page-prism">
+  <div class="page-header">
+    <div class="breadcrumb">Фигуралар → Призма</div>
+    <h2>🔷 Призма</h2>
+    <p>Тік және қиғаш призма, параллелепипед, тікбұрышты параллелепипед</p>
+  </div>
+  <div class="info-box blue">
+    <div class="info-icon">📐</div>
+    <div><div class="info-title">Негізгі формулалар</div>
+      <div class="info-text">
+        Тік призма бүйір беті: \(S_{\text{бүйір}} = P_{\text{нег}} \cdot h\)<br>
+        Толық беттік аудан: \(S_{\text{толық}} = S_{\text{бүйір}} + 2S_{\text{нег}}\)<br>
+        Көлемі: \(V = S_{\text{нег}} \cdot h\)<br>
+        Тікбұрышты параллелепипед диагоналі: \(d = \sqrt{a^2 + b^2 + c^2}\)
+      </div>
+    </div>
+  </div>
+  <div class="exercise-card">
+    <div class="ex-header">
+      <div class="ex-num" style="background:#1565C0">1</div>
+      <div class="ex-title">Параллелепипед диагоналі</div>
+      <span class="ex-level badge blue">Базалық</span>
+    </div>
+    <div class="ex-body">Тікбұрышты параллелепипедтің өлшемдері \(a=3\), \(b=4\), \(c=12\). Диагоналін табыңыз.</div>
+    <div class="ex-formula">\(d = \sqrt{a^2 + b^2 + c^2}\)</div>
+    <div class="ex-answer" id="ans-pr1">
+      \(d = \sqrt{9 + 16 + 144} = \sqrt{169} = 13\)
+    </div>
+    <button class="ex-btn" onclick="toggleAnswer('ans-pr1',this)">👁 Жауабын көру</button>
+  </div>
+  <div class="exercise-card">
+    <div class="ex-header">
+      <div class="ex-num" style="background:#1565C0">2</div>
+      <div class="ex-title">Кубтың қимасының ауданы</div>
+      <span class="ex-level badge blue">Орта</span>
+    </div>
+    <div class="ex-body">Қыры \(a=5\) кубтың жоғарғы табанының қабырғасы арқылы өтетін жазықтықтың табан жазықтығымен бұрышы \(30°\). Қима ауданын табыңыз.</div>
+    <div class="ex-formula">\(S = b \cdot c, \quad c = \dfrac{a}{\cos 30°}\)</div>
+    <div class="ex-answer" id="ans-pr2">
+      \(c = \dfrac{5}{\cos 30°} = \dfrac{10\sqrt{3}}{3}\)<br>
+      \(S = 5 \cdot \dfrac{10\sqrt{3}}{3} = \dfrac{50\sqrt{3}}{3}\)
+    </div>
+    <button class="ex-btn" onclick="toggleAnswer('ans-pr2',this)">👁 Жауабын көру</button>
+  </div>
+</div>
+
+<!-- ===== EXERCISES PAGE ===== -->
+<div class="page" id="page-exercises">
+  <div class="page-header">
+    <div class="breadcrumb">Тапсырмалар → Есептер жинағы</div>
+    <h2>✏️ НЗМ · SAT · PISA · TIMSS Есептері</h2>
+    <p>Халықаралық форматтардан іріктелген кеңістіктік ойлауға бағытталған есептер</p>
+  </div>
+
+  <div class="cards-grid-3" style="margin-bottom:24px">
+    <div class="info-box blue" style="margin:0">
+      <div class="info-icon">🟦</div>
+      <div><div class="info-title">Базалық</div><div class="info-text">Формуланы тікелей қолдану. Сызба берілген.</div></div>
+    </div>
+    <div class="info-box orange" style="margin:0">
+      <div class="info-icon">🟧</div>
+      <div><div class="info-title">Орта</div><div class="info-text">Екі формуланы біріктіру. Сызбасыз.</div></div>
+    </div>
+    <div class="info-box red" style="margin:0">
+      <div class="info-icon">🟥</div>
+      <div><div class="info-title">Жоғары</div><div class="info-text">Кеңістіктік ойлау + аналитика.</div></div>
+    </div>
+  </div>
+
+  <div class="exercise-card">
+    <div class="ex-header">
+      <div class="ex-num" style="background:#1565C0">5</div>
+      <div class="ex-title">Шар ішіне сызылған цилиндр — PISA</div>
+      <span class="ex-level badge orange">Орта</span>
+    </div>
+    <div class="ex-body">Радиусы \(R=\sqrt{3}\) см болатын шардың ішіне биіктігі мен табан диаметрі тең цилиндр сызылған. Цилиндрдің көлемін табыңыз.</div>
+    <div class="ex-formula">\((2r)^2 + H^2 = (2R)^2, \quad H=2r \Rightarrow V = 2\pi r^3\)</div>
+    <div class="ex-answer" id="ans-e5">\(r^2 = 1{,}5\), &nbsp; \(V = 3\pi\sqrt{1{,}5}\) см³</div>
+    <button class="ex-btn" onclick="toggleAnswer('ans-e5',this)">👁 Жауабын көру</button>
+  </div>
+  <div class="exercise-card">
+    <div class="ex-header">
+      <div class="ex-num" style="background:#E65100">6</div>
+      <div class="ex-title">Кубтың қимасының ауданы — НЗМ</div>
+      <span class="ex-level badge orange">Орта</span>
+    </div>
+    <div class="ex-body">Табан жазықтығымен 30° бұрыш жасайтын, жоғарғы табан қабырғасынан өтетін жазықтықпен қырлары 5 кубты қиғандағы қима ауданын табыңыз.</div>
+    <div class="ex-formula">\(S = b \cdot \dfrac{a}{\cos 30°}\)</div>
+    <div class="ex-answer" id="ans-e6">\(S = 5 \cdot \dfrac{10\sqrt{3}}{3} = \dfrac{50\sqrt{3}}{3}\)</div>
+    <button class="ex-btn orange" style="background:#E65100" onclick="toggleAnswer('ans-e6',this)">👁 Жауабын көру</button>
+  </div>
+  <div class="exercise-card">
+    <div class="ex-header">
+      <div class="ex-num" style="background:#6A1B9A">7</div>
+      <div class="ex-title">Шарды конусқа айналдыру — SAT</div>
+      <span class="ex-level badge purple">Жоғары</span>
+    </div>
+    <div class="ex-body">Радиусы \(r=1\) болатын шойын шарды балқытып, жасаушысы \(l=\sqrt{6}\) болатын конус жасалды (\(h\geq 1\)). Конустың биіктігін табыңыз.</div>
+    <div class="ex-formula">\(h^3 - 6h + 4 = 0\)</div>
+    <div class="ex-answer" id="ans-e7">\(h = 2\) &nbsp; (тексеру: \(8 - 12 + 4 = 0\) ✓)</div>
+    <button class="ex-btn" style="background:#6A1B9A" onclick="toggleAnswer('ans-e7',this)">👁 Жауабын көру</button>
+  </div>
+  <div class="exercise-card">
+    <div class="ex-header">
+      <div class="ex-num" style="background:#C62828">8</div>
+      <div class="ex-title">Қиық конустың бүйір беті — Олимпиада</div>
+      <span class="ex-level badge" style="background:#FFEBEE;color:#C62828">Олимпиадалық</span>
+    </div>
+    <div class="ex-body">Қиық конустың табандарының радиустары \(r=9\) және \(R=24\). Осьтік қиманың диагональдарының қиылысу нүктесінен жасаушы \(60°\)-пен көрінеді. Бүйір бетінің ауданын табыңыз.</div>
+    <div class="ex-formula">\(S_{\text{бүйір}} = \pi(R+r) \cdot l\)</div>
+    <div class="ex-answer" id="ans-e8">
+      \(l = 14\sqrt{3}\)<br>
+      \(S = \pi(24+9) \cdot 14\sqrt{3} = 462\sqrt{3}\pi\)
+    </div>
+    <button class="ex-btn" style="background:#C62828" onclick="toggleAnswer('ans-e8',this)">👁 Жауабын көру</button>
+  </div>
+</div>
+
+<!-- ===== FORMULAS PAGE ===== -->
+<div class="page" id="page-formulas">
+  <div class="page-header">
+    <div class="breadcrumb">Анықтамалық → Формулалар кестесі</div>
+    <h2>📋 Стереометрия формулалары</h2>
+    <p>Барлық негізгі формулалар — бір кестеде</p>
+  </div>
+
+  <h3 class="section-title" style="font-size:16px;margin-bottom:12px">Айналу денелері</h3>
+  <table class="formula-table" style="margin-bottom:24px">
+    <thead><tr><th>Фигура</th><th>Бүйір беті</th><th>Толық беті</th><th>Көлемі</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Цилиндр</strong></td><td>\(2\pi rh\)</td><td>\(2\pi r(h+r)\)</td><td>\(\pi r^2 h\)</td></tr>
+      <tr><td><strong>Конус</strong></td><td>\(\pi rl\)</td><td>\(\pi r(l+r)\)</td><td>\(\frac{1}{3}\pi r^2 h\)</td></tr>
+      <tr><td><strong>Қиық конус</strong></td><td>\(\pi(R+r)l\)</td><td>—</td><td>\(\frac{\pi h}{3}(R^2+r^2+Rr)\)</td></tr>
+      <tr><td><strong>Шар / Сфера</strong></td><td>—</td><td>\(4\pi r^2\)</td><td>\(\frac{4}{3}\pi r^3\)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="section-title" style="font-size:16px;margin-bottom:12px">Көпжақтар</h3>
+  <table class="formula-table" style="margin-bottom:24px">
+    <thead><tr><th>Фигура</th><th>Бүйір беті</th><th>Толық беті</th><th>Көлемі</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Тік призма</strong></td><td>\(P_{\text{нег}} \cdot h\)</td><td>\(S_{\text{бүйір}}+2S_{\text{нег}}\)</td><td>\(S_{\text{нег}} \cdot h\)</td></tr>
+      <tr><td><strong>Дұрыс пирамида</strong></td><td>\(\frac{1}{2}P_{\text{нег}} \cdot a\)</td><td>\(S_{\text{бүйір}}+S_{\text{нег}}\)</td><td>\(\frac{1}{3}S_{\text{нег}} \cdot h\)</td></tr>
+      <tr><td><strong>Қиық пирамида</strong></td><td>—</td><td>—</td><td>\(\frac{h}{3}(S_1+S_2+\sqrt{S_1 S_2})\)</td></tr>
+      <tr><td><strong>Тетраэдр</strong></td><td>—</td><td>\(a^2\sqrt{3}\)</td><td>\(\frac{a^3\sqrt{2}}{12}\)</td></tr>
+      <tr><td><strong>Куб</strong></td><td>\(4a^2\)</td><td>\(6a^2\)</td><td>\(a^3\)</td></tr>
+      <tr><td><strong>Тікб. параллел.</strong></td><td>—</td><td>\(2(ab+bc+ca)\)</td><td>\(abc\)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box blue">
+    <div class="info-icon">📐</div>
+    <div>
+      <div class="info-title">Маңызды байланыстар</div>
+      <div class="info-text">
+        Конус жасаушысы: \(l = \sqrt{r^2 + h^2}\)<br>
+        Призма диагоналі: \(d = \sqrt{a^2+b^2+c^2}\)<br>
+        Кеңістіктегі қашықтық: \(\rho = \sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}\)<br>
+        Шарға сыйған конус: \(R^2h = 4r^3\) (шар радиусы \(r\) болғанда)
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-'+id);
+  if(pg) pg.classList.add('active');
+  event && event.target && event.target.closest('.nav-item') && event.target.closest('.nav-item').classList.add('active');
+  if(window.MathJax) MathJax.typesetPromise && MathJax.typesetPromise();
+  if(window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+
+function switchTab(btn, prefix, id) {
+  const bar = btn.closest('.tab-bar');
+  bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const page = btn.closest('.page') || btn.closest('.main');
+  document.querySelectorAll('[id^="'+prefix+'-"]').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById(prefix+'-'+id);
+  if(panel) { panel.classList.add('active'); if(window.MathJax) MathJax.typesetPromise && MathJax.typesetPromise([panel]); }
+}
+
+function toggleAnswer(id, btn) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const show = el.classList.toggle('show');
+  btn.textContent = show ? '🙈 Жасыру' : '👁 Жауабын көру';
+  if(show && window.MathJax) MathJax.typesetPromise && MathJax.typesetPromise([el]);
+}
+
+function toggleMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// Click outside sidebar closes it on mobile
+document.addEventListener('click', function(e){
+  const sb = document.getElementById('sidebar');
+  if(window.innerWidth < 900 && sb.classList.contains('open') && !sb.contains(e.target) && !e.target.classList.contains('menu-toggle')){
+    sb.classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
